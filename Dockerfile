@@ -34,25 +34,25 @@ RUN yum -y install \
     ImageMagick ImageMagick-devel pcre pcre-devel m4
 	
 # pam
-RUN cat >> /etc/pam.d/login <<EOF
-session  required  /lib64/security/pam_limits.so
+RUN cat >> /etc/pam.d/login <<EOF\
+session  required  /lib64/security/pam_limits.so\
 EOF
 
 # time zone
-RUN cat > /etc/sysconfig/clock << EOF
-ZONE=Asia/Shanghai 
-UTC=false 
-ARC=false
+RUN cat > /etc/sysconfig/clock << EOF\
+ZONE=Asia/Shanghai\
+UTC=false\
+ARC=false\
 EOF
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 # env variables
-RUN cat >> /etc/bashrc << EOF
-
-HISTFILESIZE=2000
-HISTSIZE=2000
-HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S "
-export HISTTIMEFORMAT
+RUN cat >> /etc/bashrc << EOF \
+\
+HISTFILESIZE=2000\
+HISTSIZE=2000\
+HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S "\
+export HISTTIMEFORMAT\
 EOF
 
 # optimize ulimit
