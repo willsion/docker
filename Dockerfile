@@ -34,12 +34,12 @@ RUN yum -y install \
     ImageMagick ImageMagick-devel pcre pcre-devel m4
 	
 # pam
-RUN cat >> /etc/pam.d/login <<EOF\
+RUN cat >> /etc/pam.d/login <<EOF \
 session  required  /lib64/security/pam_limits.so\
 EOF
 
 # time zone
-RUN cat > /etc/sysconfig/clock << EOF\
+RUN cat > /etc/sysconfig/clock << EOF \
 ZONE=Asia/Shanghai\
 UTC=false\
 ARC=false\
@@ -193,4 +193,3 @@ RUN rm -rf ${SRC_DIR} \
 
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
-
