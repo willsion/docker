@@ -8,14 +8,15 @@ MAINTAINER willsion
 ADD http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm  /root/
 RUN rpm -Uvh /root/epel-release-6-8.noarch.rpm
 
+# --------------------------------------------------
+# install base libs
+# --------------------------------------------------
 RUN yum -y groupinstall "Development tools"
-
 RUN yum -y install \
 	lsof telnet sysstat iotop bc db4-devel db4 dmidecode \
 	iptstate tree man parted perl-ExtUtils-MakeMaker package \
 	openldap openldap-devel nss_ldap openldap-clients \
 	openldap-servers lrzsz bash wget
-
 RUN yum -y install \
     gcc gcc-c++ perl-CPAN zlib-devel gettext-devel tcl \
     tar wget git vim screen python-pip supervisor \
@@ -34,33 +35,23 @@ RUN yum -y install \
     ImageMagick ImageMagick-devel pcre pcre-devel m4
 	
 # pam
-RUN cat >> /etc/pam.d/login <<EOF \
-session  required  /lib64/security/pam_limits.so\
-EOF
-
-# time zone
-RUN cat > /etc/sysconfig/clock << EOF \
-ZONE=Asia/Shanghai\
-UTC=false\
-ARC=false\
-EOF
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+RUN echo 'session  required  /lib64/security/pam_limits.so' >>/etc/pam.d/login
 
 # env variables
-RUN cat >> /etc/bashrc << EOF \
-\
-HISTFILESIZE=2000\
-HISTSIZE=2000\
-HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S "\
-export HISTTIMEFORMAT\
-EOF
+ENV bashfile /etc/bashrc
+RUN echo 'HISTFILESIZE=2000' >> $bashfile \
+	&& echo 'HISTSIZE=2000' >> $bashfile \
+	&& echo 'HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S "' >> $bashfile \
+	&& echo 'export HISTTIMEFORMAT' >> $bashfile
 
 # optimize ulimit
-RUN sed -i "/# End of file/i\\* soft nofile 955360" /etc/security/limits.conf
-RUN sed -i "/# End of file/i\\* hard nofile 955360" /etc/security/limits.conf
-RUN sed -i "/# End of file/i\\* soft nproc 655350" /etc/security/limits.conf
-RUN sed -i "/# End of file/i\\* hard nproc 655350" /etc/security/limits.conf
-RUN sed -i "s/^\(*          soft    nproc     1024\)/#\1/" /etc/security/limits.d/90-nproc.conf
+ENV limitfile /etc/security/limits.conf
+ENV limitextfile /etc/security/limits.d/90-nproc.conf
+RUN sed -i "/# End of file/i\\* soft nofile 955360" $limitfile
+RUN sed -i "/# End of file/i\\* hard nofile 955360" $limitfile
+RUN sed -i "/# End of file/i\\* soft nproc 655350" $limitfile
+RUN sed -i "/# End of file/i\\* hard nproc 655350" $limitfile
+RUN sed -i "s/^\(*          soft    nproc     1024\)/#\1/" $limitextfile
 
 # using by php ampq
 RUN cd /root \
